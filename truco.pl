@@ -21,8 +21,8 @@ resultado(Carta1, Carta2, Resultado) :-
 envido(Mano, Valor) :-
  %validar cartas ingresadas
  hayEnvido(Mano),
- cartasEnvido(Mano, CartaEnvido1, CartaEnvido2),
- valorEnvido(CartaEnvido1, CartaEnvido2, Valor).
+ seleccionarCartasEnvido(Mano, CartaEnvido1, CartaEnvido2),
+ obtenerValorEnvido(CartaEnvido1, CartaEnvido2, Valor).
 
 hayEnvido([carta(_, Palo1), carta(_, Palo2), carta(_, Palo3)]) :- 
   Palo1 == Palo2;
@@ -35,14 +35,30 @@ hayFlor([carta(_, Palo1), carta(_, Palo2), carta(_, Palo3)]) :-
 
 mismoPalo(carta(_, Palo1), carta(_, Palo2)) :- Palo1 == Palo2.
 
-cartasEnvido([Carta1, Carta2, Carta3], CartaEnvido1, CartaEnvido2) :-
-    hayFlor([Carta1, Carta2, Carta3]), 
-    mismoPalo(Carta1, Carta2),  CartaEnvido1 = Carta1, CartaEnvido2 = Carta2, 
-    mismoPalo(Carta2, Carta3),  CartaEnvido1 = Carta2, CartaEnvido2 = Carta3, 
-    mismoPalo(Carta3, Carta1),  CartaEnvido1 = Carta3, CartaEnvido2 = Carta1, 
+seleccionarCartasEnvido([Carta1, Carta2, Carta3], CartaEnvido1, CartaEnvido2) :-
+    (hayFlor([Carta1, Carta2, Carta3]), obtenerMejoresCartasEnvidoDe3([Carta1, Carta2, Carta3], CartaEnvido1, CartaEnvido2));
+    (mismoPalo(Carta1, Carta2),  CartaEnvido1 = Carta1, CartaEnvido2 = Carta2);
+    (mismoPalo(Carta2, Carta3),  CartaEnvido1 = Carta2, CartaEnvido2 = Carta3); 
+    (mismoPalo(Carta3, Carta1),  CartaEnvido1 = Carta3, CartaEnvido2 = Carta1). 
 
-valorEnvido(carta(Numero1, _), carta(Numero2, _), Valor) :-
+obtenerMejoresCartasEnvidoDe3([carta(Numero1,_), carta(Numero2,_), carta(Numero3,_)], CartaEnvido1, CartaEnvido2))
+    valorCartaEnvido(carta(Numero1, _), ValorEnvidoCarta1),
+    valorCartaEnvido(carta(Numero2, _), ValorEnvidoCarta2),
+    valorCartaEnvido(carta(Numero3, _), ValorEnvidoCarta3),
+    
+/*
+obtenerValorEnvido(carta(Numero1, _), carta(Numero2, _), Valor) :-
     (7 >= Numero1, 7 >= Numero2, Valor is Numero1 + Numero2 + 20); 
     (7 <  Numero1, 7 >= Numero2, Valor is Numero2 + 20);
     (7 >= Numero1, 7 <  Numero2, Valor is Numero1 + 20);
     Valor is 20.
+*/
+
+obtenerValorEnvido(Carta1, Carta2, Valor) :- 
+  valorCartaEnvido(Carta1, ValorEnvidoCarta1),
+  valorCartaEnvido(Carta2, ValorEnvidoCarta2),
+  Valor is 20 +  ValorEnvidoCarta1 + ValorEnvidoCarta2.
+
+valorCartaEnvido(carta(Numero, _), ValorEnvido) :-
+  (7 >= Numero, ValorEnvido = Numero);
+  ValorEnvido = 0.
