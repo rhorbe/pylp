@@ -30,12 +30,21 @@ envido(Mano, Valor) :-
 
 
 cartasValidas([Carta1, Carta2, Carta3]) :- 
-    Carta1, Carta2, Carta3.
+    Carta1, Carta2, Carta3, 
+    cartasDistintas([Carta1, Carta2, Carta3]).
+
+
+cartasDistintas([Carta1, Carta2, Carta3]) :-
+    Carta1 \= Carta2,
+    Carta2 \= Carta3,
+    Carta3 \= Carta1.
+
 
 hayEnvido([Carta1, Carta2, Carta3]) :-
     dosMismoPalo(Carta1, Carta2);
     dosMismoPalo(Carta2, Carta3);
     dosMismoPalo(Carta3, Carta1).
+
 
 tresMismoPalo([Carta1, Carta2, Carta3]) :-
     dosMismoPalo(Carta1, Carta2),
@@ -43,6 +52,7 @@ tresMismoPalo([Carta1, Carta2, Carta3]) :-
 
 dosMismoPalo(carta(_, Palo1), carta(_, Palo2)) :-
     Palo1 == Palo2.
+
 
 seleccionarCartasEnvido([Carta1, Carta2, Carta3], CartaEnvido1, CartaEnvido2) :-
     (
@@ -52,6 +62,7 @@ seleccionarCartasEnvido([Carta1, Carta2, Carta3], CartaEnvido1, CartaEnvido2) :-
     (dosMismoPalo(Carta1, Carta2),  CartaEnvido1 = Carta1, CartaEnvido2 = Carta2);
     (dosMismoPalo(Carta2, Carta3),  CartaEnvido1 = Carta2, CartaEnvido2 = Carta3);
     (dosMismoPalo(Carta3, Carta1),  CartaEnvido1 = Carta3, CartaEnvido2 = Carta1).
+
 
 obtenerMejoresCartasEnvidoDe3([Carta1, Carta2, Carta3], CartaEnvido1, CartaEnvido2) :-
     valorCartaEnvido(Carta1, ValorEnvidoCarta1),
@@ -64,10 +75,12 @@ obtenerMejoresCartasEnvidoDe3([Carta1, Carta2, Carta3], CartaEnvido1, CartaEnvid
         (ValorMinimo is ValorEnvidoCarta3, CartaEnvido1 = Carta1, CartaEnvido2 = Carta1) 
     ).
 
+
 obtenerValorEnvido(Carta1, Carta2, Valor) :-
   valorCartaEnvido(Carta1, ValorEnvidoCarta1),
   valorCartaEnvido(Carta2, ValorEnvidoCarta2),
   Valor is 20 +  ValorEnvidoCarta1 + ValorEnvidoCarta2.
+
 
 valorCartaEnvido(carta(Numero, _), ValorEnvido) :-
   (7 >= Numero, ValorEnvido = Numero);
