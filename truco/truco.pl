@@ -12,13 +12,18 @@
 resultado(Carta1, Carta2, Resultado) :-
   valor(Carta1, Valor1),
   valor(Carta2, Valor2),
-  (Valor1 > Valor2, Resultado = gana;
-  Valor1 < Valor2, Resultado = pierde;
-  Valor1 == Valor2, Resultado = parda).
+  (
+    Valor1 > Valor2, Resultado = gana;
+    Valor1 < Valor2, Resultado = pierde;
+    Valor1 == Valor2, Resultado = parda
+    ).
 
 % OBJETIVOS INTERMEDIOS
+
+% envido(Mano, Valor)
 % Dada una mano indique su valor de envido. 
-% Si se poseen dos o más cartas del mismo palo, se suman sus valores y luego se suman 20.
+% Si se poseen dos o más cartas del mismo palo, se suman sus valores y luego se 
+% suman 20.
 % Con las siguientes excepciones:
 %  - 10, 11, 12 valen 20 pero no se suman los otros 20.
 %  – Si las tres cartas son del mismo palo, vamos a tomar la suma de mayor valor
@@ -89,9 +94,10 @@ valorCartaEnvido(carta(Numero, _), ValorEnvido) :-
   ValorEnvido = 0.
 
 
-% gana(Mano1, Mano2) que reciba las dos listas de cartas, siendo las manos de los jugadores en el orden
-% en que se juegan. La regla indica si Mano1 le gana a Mano2.
-
+% gana(Mano1, Mano2) 
+% Recibe las dos listas de cartas, siendo las manos de los jugadores en el orden
+% en que se juegan. 
+% La regla indica si Mano1 le gana a Mano2.
 gana(Mano1, Mano2) :- 
     resultadosParciales(Mano1, Mano2, ListaResultadosParciales),
     ganaRonda(ListaResultadosParciales).
@@ -108,6 +114,18 @@ parcialesAux([Carta1 | Resto1], [Carta2 | Resto2],Aux, ListaResultadosParciales)
     append(Aux, [Resultado], ConcatenacionListas),    
     parcialesAux(Resto1, Resto2, ConcatenacionListas, ListaResultadosParciales).
 
-% • mejorJugado(Mano1, Mano2, Orden). Esta regla recibe las mismas listas que la regla gana, pero
-% en último lugar indica el nuevo orden en el que jugar Mano1 para para ganarle a Mano2. Tengan en
-% cuenta que puede haber más de un orden posible para ganarle.
+
+% mejorJugado(Mano1, Mano2, Orden)
+% Esta regla recibe las mismas listas que la regla gana, pero en último lugar 
+% indica el nuevo orden en el que jugar Mano1 para para ganarle a Mano2. 
+% Tengan en cuenta que puede haber más de un orden posible para ganarle.
+mejorJugado(Mano1, Mano2, Orden) :- 
+    posibleJugada(Mano1, Orden),
+    gana(Orden, Mano2).
+
+
+posibleJugada(Mano, [X, Y, Z]) :-
+    member(X, Mano),
+    member(Y, Mano),
+    member(Z, Mano),
+    X \= Y, Y \= Z, X \= Z.
