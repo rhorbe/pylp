@@ -1,5 +1,6 @@
 :- include(cartas).
 :- include(escala).
+:- include(gana_ronda).
 
 % OBJETIVOS PRELIMINARES
 % Dada una carta, indica la posición de la misma en la escala de valores.
@@ -50,6 +51,7 @@ tresMismoPalo([Carta1, Carta2, Carta3]) :-
     dosMismoPalo(Carta1, Carta2),
     dosMismoPalo(Carta1, Carta3).
 
+
 dosMismoPalo(carta(_, Palo1), carta(_, Palo2)) :-
     Palo1 == Palo2.
 
@@ -85,3 +87,27 @@ obtenerValorEnvido(Carta1, Carta2, Valor) :-
 valorCartaEnvido(carta(Numero, _), ValorEnvido) :-
   (7 >= Numero, ValorEnvido = Numero);
   ValorEnvido = 0.
+
+
+% gana(Mano1, Mano2) que reciba las dos listas de cartas, siendo las manos de los jugadores en el orden
+% en que se juegan. La regla indica si Mano1 le gana a Mano2.
+
+gana(Mano1, Mano2) :- 
+    resultadosParciales(Mano1, Mano2, ListaResultadosParciales),
+    ganaRonda(ListaResultadosParciales).
+
+
+resultadosParciales(Mano1, Mano2, ListaResultadosParciales):-
+    parcialesAux(Mano1, Mano2, [], ListaResultadosParciales).
+
+
+parcialesAux([], _, Aux, Aux).
+
+parcialesAux([Carta1 | Resto1], [Carta2 | Resto2],Aux, ListaResultadosParciales) :-
+    resultado(Carta1, Carta2, Resultado),
+    append(Aux, [Resultado], ConcatenacionListas),    
+    parcialesAux(Resto1, Resto2, ConcatenacionListas, ListaResultadosParciales).
+
+% • mejorJugado(Mano1, Mano2, Orden). Esta regla recibe las mismas listas que la regla gana, pero
+% en último lugar indica el nuevo orden en el que jugar Mano1 para para ganarle a Mano2. Tengan en
+% cuenta que puede haber más de un orden posible para ganarle.
