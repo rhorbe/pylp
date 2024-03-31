@@ -1,3 +1,9 @@
+/* 
+Los siguientes hechos asignan a cada carta un número en una escala del 1 al 14
+correspondiente su valor en la escala de valores del truco.
+Siendo el 14 el mayor valor que puede tener una carta y 1 el menor.
+*/ 
+
 % Valor
 valor(carta(1, espada),14).
 valor(carta(2, espada),9).

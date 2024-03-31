@@ -3,9 +3,12 @@
 :- include(gana_ronda).
 
 % OBJETIVOS PRELIMINARES
-% Dada una carta, indica la posición de la misma en la escala de valores.
-% valor(carta(Numero, Palo), Valor)
 
+% valor(carta(Numero, Palo), Valor)
+% Dada una carta, indica la posición de la misma en la escala de valores.
+% (Queda resuelto con los hechos que asignan valor a cada una de las cartas)
+
+% resultado(Carta1, Carta2, Resultado) 
 % Indica el resultado de enfrentar Carta1 y Carta2.
 % Los resultados son gana, pierde o parda.
 
@@ -37,38 +40,38 @@ envido(Mano, Valor) :-
 
 cartasValidas([Carta1, Carta2, Carta3]) :- 
     Carta1, Carta2, Carta3, 
-    cartasDistintas([Carta1, Carta2, Carta3]).
+    sonCartasDistintas(Carta1, Carta2, Carta3).
 
 
-cartasDistintas([Carta1, Carta2, Carta3]) :-
+sonCartasDistintas(Carta1, Carta2, Carta3) :-
     Carta1 \= Carta2,
     Carta2 \= Carta3,
     Carta3 \= Carta1.
 
 
 hayEnvido([Carta1, Carta2, Carta3]) :-
-    dosMismoPalo(Carta1, Carta2);
-    dosMismoPalo(Carta2, Carta3);
-    dosMismoPalo(Carta3, Carta1).
+    sonMismoPalo(Carta1, Carta2);
+    sonMismoPalo(Carta2, Carta3);
+    sonMismoPalo(Carta3, Carta1).
 
 
-tresMismoPalo([Carta1, Carta2, Carta3]) :-
-    dosMismoPalo(Carta1, Carta2),
-    dosMismoPalo(Carta1, Carta3).
+sonMismoPalo(Carta1, Carta2, Carta3) :-
+    sonMismoPalo(Carta1, Carta2),
+    sonMismoPalo(Carta1, Carta3).
 
 
-dosMismoPalo(carta(_, Palo1), carta(_, Palo2)) :-
+sonMismoPalo(carta(_, Palo1), carta(_, Palo2)) :-
     Palo1 == Palo2.
 
 
 seleccionarCartasEnvido([Carta1, Carta2, Carta3], CartaEnvido1, CartaEnvido2) :-
     (
-        tresMismoPalo([Carta1, Carta2, Carta3]),
+        sonMismoPalo(Carta1, Carta2, Carta3),
         obtenerMejoresCartasEnvidoDe3([Carta1, Carta2, Carta3], CartaEnvido1, CartaEnvido2)
     );
-    (dosMismoPalo(Carta1, Carta2),  CartaEnvido1 = Carta1, CartaEnvido2 = Carta2);
-    (dosMismoPalo(Carta2, Carta3),  CartaEnvido1 = Carta2, CartaEnvido2 = Carta3);
-    (dosMismoPalo(Carta3, Carta1),  CartaEnvido1 = Carta3, CartaEnvido2 = Carta1).
+    (sonMismoPalo(Carta1, Carta2),  CartaEnvido1 = Carta1, CartaEnvido2 = Carta2);
+    (sonMismoPalo(Carta2, Carta3),  CartaEnvido1 = Carta2, CartaEnvido2 = Carta3);
+    (sonMismoPalo(Carta3, Carta1),  CartaEnvido1 = Carta3, CartaEnvido2 = Carta1).
 
 
 obtenerMejoresCartasEnvidoDe3([Carta1, Carta2, Carta3], CartaEnvido1, CartaEnvido2) :-
@@ -124,8 +127,52 @@ mejorJugado(Mano1, Mano2, Orden) :-
     gana(Orden, Mano2).
 
 
-posibleJugada(Mano, [X, Y, Z]) :-
-    member(X, Mano),
-    member(Y, Mano),
-    member(Z, Mano),
-    X \= Y, Y \= Z, X \= Z.
+posibleJugada(Mano, [Carta1, Carta2, Carta3]) :-
+    member(Carta1, Mano),
+    member(Carta2, Mano),
+    member(Carta3, Mano),
+    sonCartasDistintas(Carta1, Carta2, Carta3).
+
+
+% OBJETIVO PRINCIPAL
+ %aceptarEnvido(ManoPropia, CartasEnMesa)
+ %* Valor envido mano propia, 
+ %* obtener posibles manos jugador 2
+ %* obtener valores envido mano jugador 2
+ %* obtener posibilidades de triunfo
+ %* Si el porcentaje es mayor a 50% aceptar. 
+/*
+aceptarEnvido(ManoPropia, CartasEnMesa):- 
+    envido(ManoPropia, ValorEnvidoPropio),
+    promedioPosiblesEnvidosAdversario(ManoPropia, CartasEnMesa, PromedioEnvidoAdversario),
+    ValorEnvidoPropio > PromedioEnvidoAdversario.
+
+*/
+/*promedioPosiblesEnvidosAdversario(ManoPropia, CartasEnMesa, PromedioEnvidoAdversario) :-
+    listaValoresPosiblesEnvidos*/
+
+
+posibleCartaAdversario(ManoPropia, CartasEnMesa, PosibleCarta) :-
+    listaCartasConocidas(ManoPropia, CartasEnMesa, ListaCartasConocidas),
+    listaCompletaCartas(ListaCompletaCartas),
+    member(PosibleCarta, ListaCompletaCartas),
+    \+ member(PosibleCarta, ListaCartasConocidas).
+
+
+listaCartasConocidas(ManoPropia, CartasEnMesa, ListaCartasConocidas):-
+    append(ManoPropia, CartasEnMesa, ListaCartasConocidas).
+
+
+listaCompletaCartas(ListaCompletaCartas):-
+    findall(carta(Numero, Palo), carta(Numero, Palo), ListaCompletaCartas).
+
+
+
+% aceptarTruco(ManoPropia, [CartasPropiasJugadas, CartasDelOponenteJugadas])
+
+
+% En base a las cartas jugadas saber si se 
+
+% que deben deducir lógicamente si aceptar o no.
+% ManoPropia contiene la mano propia y luego una lista con dos listas más, las 
+% cartas propias y las cartas del oponente en el orden que fueron jugadas
