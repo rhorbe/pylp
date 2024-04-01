@@ -35,7 +35,8 @@ envido(Mano, Valor) :-
  cartasValidas(Mano), 
  hayEnvido(Mano),
  seleccionarCartasEnvido(Mano, CartaEnvido1, CartaEnvido2),
- obtenerValorEnvido(CartaEnvido1, CartaEnvido2, Valor).
+ obtenerValorEnvido(CartaEnvido1, CartaEnvido2, Valor),
+ !.
 
 
 cartasValidas([Carta1, Carta2, Carta3]) :- 
@@ -93,8 +94,12 @@ obtenerValorEnvido(Carta1, Carta2, Valor) :-
 
 
 valorCartaEnvido(carta(Numero, _), ValorEnvido) :-
-  (7 >= Numero, ValorEnvido = Numero);
-  ValorEnvido = 0.
+    7 >= Numero, 
+    ValorEnvido = Numero.
+
+valorCartaEnvido(carta(Numero, _), ValorEnvido) :-
+    7 < Numero,
+    ValorEnvido = 0.
 
 
 % gana(Mano1, Mano2) 
@@ -135,44 +140,57 @@ posibleJugada(Mano, [Carta1, Carta2, Carta3]) :-
 
 
 % OBJETIVO PRINCIPAL
- %aceptarEnvido(ManoPropia, CartasEnMesa)
- %* Valor envido mano propia, 
- %* obtener posibles manos jugador 2
- %* obtener valores envido mano jugador 2
- %* obtener posibilidades de triunfo
- %* Si el porcentaje es mayor a 50% aceptar. 
-/*
+% aceptarEnvido(ManoPropia, CartasEnMesa)
 aceptarEnvido(ManoPropia, CartasEnMesa):- 
     envido(ManoPropia, ValorEnvidoPropio),
     promedioPosiblesEnvidosAdversario(ManoPropia, CartasEnMesa, PromedioEnvidoAdversario),
     ValorEnvidoPropio > PromedioEnvidoAdversario.
+ 
 
-*/
-/*promedioPosiblesEnvidosAdversario(ManoPropia, CartasEnMesa, PromedioEnvidoAdversario) :-
-    listaValoresPosiblesEnvidos*/
-
-
-posibleCartaAdversario(ManoPropia, CartasEnMesa, PosibleCarta) :-
+promedioPosiblesEnvidosAdversario(ManoPropia, CartasEnMesa, Promedio) :-
     listaCartasConocidas(ManoPropia, CartasEnMesa, ListaCartasConocidas),
-    listaCompletaCartas(ListaCompletaCartas),
-    member(PosibleCarta, ListaCompletaCartas),
-    \+ member(PosibleCarta, ListaCartasConocidas).
+    findall(PosibleMano, posibleMano(ListaCartasConocidas, CartasEnMesa, PosibleMano), ListaPosiblesManos),
+    promedioEnvidosListaManos(ListaPosiblesManos, Promedio).
+
+
+promedioEnvidosListaManos(ListaPosiblesManos, Promedio):-
+    promedioEnvidosListaManosAux(ListaPosiblesManos, 0, 0, Promedio).
+
+promedioEnvidosListaManosAux([], Suma, Cantidad, Promedio):-
+    Promedio is Suma / Cantidad.
+promedioEnvidosListaManosAux([Mano|Resto], Suma, Cantidad, Promedio):-
+    envido(Mano, Valor),
+    Suma1 = Suma + Valor,
+    Cantidad1 = Cantidad + 1,
+    promedioEnvidosListaManosAux( Resto, Suma1, Cantidad1, Promedio).
+
+
+listaValoresEnvido(ListaPosiblesManos, ListaValoresEnvido):-
+    member(Mano, ListaPosiblesManos),
+    findall(Valor, envido(Mano, Valor), ListaValoresEnvido).
+
+
+promedioLista(Lista, Promedio) :- 
+    length(Lista, Cantidad), sumlist(Lista, Suma), 
+    Promedio is Suma / Cantidad.
+
+
+posibleMano(_, ManoParcial, PosibleMano) :-
+    manoCompleta(ManoParcial), 
+    PosibleMano = ManoParcial.
+posibleMano(CartasExcluidas, ManoParcial, PosibleMano) :-
+    not(manoCompleta(ManoParcial)),
+    posibleCarta(CartasExcluidas, NuevaCarta),
+    posibleMano([NuevaCarta | CartasExcluidas], [NuevaCarta | ManoParcial], PosibleMano).
+
+
+manoCompleta(Mano):- length(Mano, 3).
+
+
+posibleCarta(Excluidas, carta(N, P)) :- 
+    carta(N, P),   
+    not(member(carta(N, P), Excluidas)).
 
 
 listaCartasConocidas(ManoPropia, CartasEnMesa, ListaCartasConocidas):-
     append(ManoPropia, CartasEnMesa, ListaCartasConocidas).
-
-
-listaCompletaCartas(ListaCompletaCartas):-
-    findall(carta(Numero, Palo), carta(Numero, Palo), ListaCompletaCartas).
-
-
-
-% aceptarTruco(ManoPropia, [CartasPropiasJugadas, CartasDelOponenteJugadas])
-
-
-% En base a las cartas jugadas saber si se 
-
-% que deben deducir lógicamente si aceptar o no.
-% ManoPropia contiene la mano propia y luego una lista con dos listas más, las 
-% cartas propias y las cartas del oponente en el orden que fueron jugadas
