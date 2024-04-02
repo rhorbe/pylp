@@ -140,7 +140,12 @@ posibleJugada(Mano, [Carta1, Carta2, Carta3]) :-
 
 
 % OBJETIVO PRINCIPAL
+
 % aceptarEnvido(ManoPropia, CartasEnMesa)
+% Se acepta envido cuando en base a las cartas propias y las jugadas por el 
+% oponente, se calcula que el promedio de valores de los posibles envidos del 
+% oponente no superar al valor del envido propio.
+
 aceptarEnvido(ManoPropia, CartasEnMesa):- 
     envido(ManoPropia, ValorEnvidoPropio),
     promedioPosiblesEnvidosAdversario(ManoPropia, CartasEnMesa, PromedioEnvidoAdversario),
@@ -194,3 +199,83 @@ posibleCarta(Excluidas, carta(N, P)) :-
 
 listaCartasConocidas(ManoPropia, CartasEnMesa, ListaCartasConocidas):-
     append(ManoPropia, CartasEnMesa, ListaCartasConocidas).
+
+
+% aceptarTruco(ManoPropia, [CartasPropiasJugadas, CartasDelOponenteJugadas])
+% Se acepta truco cuando en base a las cartas propias y las jugadas por el 
+% oponente, se calcula que las posibilidades de ganas son mayores a las de  
+% perder.
+
+aceptarTruco(ManoPropia, [CartasPropiasJugadas, CartasDelOponenteJugadas]) :-
+% Armar todas las posibles combinaciones de manos propias, teniendo en cuenta
+% las cartas ya jugadas.
+% Armar todas las posibles 
+
+%Obtener cartas sin jugar propias 
+%Obtener posibles cartas sin jugar adversario
+%Armar lista con posibles secuencias de juego propias (Tener en cuenta las ya jugadas)
+%Armar lista con posibles secuencias de juego adversario (Tener en cuenta las ya jugadas)
+%Realizar posibles combinaciones de juegos y contar triunfos y derrotas.
+
+obtenerCartasSinJugarPropias(
+    ManoPropia, 
+    CartasPropiasJugadas, 
+    CartasSinJugarPropias),
+obtenerCartasSinJugarAdversario(
+    ManoPropia, 
+    CartasDelOponenteJugadas, 
+    ListaPosiblesCartasSinJugarAdversario),
+obtenerListaPosiblesSecuenciasJuegoPropias(
+    CartasPropiasJugadas,
+    CartasSinJugarPropias, 
+    ListaPosiblesSecuenciasJuegoPropias),
+obtenerListaPosiblesSecuenciasJuegoAdversario(
+    ListaPosiblesCartasSinJugarAdversario, 
+    ListaPosiblesSecuenciasJuegoAdversario),
+obtenerEstadisticasResultados(
+    ListaPosiblesSecuenciasJuegoPropias,
+    ListaPosiblesSecuenciasJuegoAdversario,
+    Triunfos,
+    Derrotas),
+Triunfos > Derrotas.
+
+obtenerCartasSinJugarPropias(ManoPropia, CartasPropiasJugadas, CartasSinJugarPropias):-
+    restaListas(ManoPropia, CartasPropiasJugadas, CartasSinJugarPropias).
+
+obtenerCartasSinJugarAdversario(ManoPropia, CartasDelOponenteJugadas, ListaPosiblesCartasSinJugarAdversario):-
+    listaCartasConocidas(ManoPropia, CartasDelOponenteJugadas, ListaCartasConocidas),
+    listaCompletaCartas(ListaCompletaCartas),
+    restaListas(ListaCompletaCartas, ListaCartasConocidas, ListaPosiblesCartasSinJugarAdversario).
+
+listaCompletaCartas(ListaCompletaCartas):-
+    findall(carta(Numero, Palo), carta(Numero, Palo), ListaCompletaCartas).
+
+obtenerListaPosiblesSecuenciasJuegoPropias(CartasPropiasJugadas,CartasSinJugarPropias, ListaPosiblesSecuenciasJuegoPropias):-
+    
+
+    
+
+
+
+%completarManoPropiaJugada(ManoPropia, CartasPropiasJugadas, PosibleSecuenciaJuego).
+
+
+
+
+completarManoPropiaJugada(ManoPropia, CartasPropiasJugadas, PosibleSecuenciaJuego):-
+    ManoPropia = [Carta1, Carta2, Carta3],
+    posibleJugada(ManoPropia, [CartaJugada1, CartaJugada2, CartaJugada3]),
+
+
+
+restaListas([], _, []).
+
+% Restar elementos de la lista Sustraendo de la lista Original, resultando en Diferencia
+restaListas([X|ColaOriginal], Sustraendo, Diferencia ) :-
+    member(X, Sustraendo),
+    restaListas(ColaOriginal, Sustraendo, Diferencia).
+
+% Si el elemento X no está en Sustraendo, lo incluimos en Diferencia
+restaListas([X|ColaOriginal], Sustraendo, [X|Diferencia]) :-
+    not(member(X, Sustraendo)),
+    restaListas(ColaOriginal, Sustraendo, Diferencia).
