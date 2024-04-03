@@ -22,7 +22,7 @@ sum_list([X|Xs], Sum) :-
 
 
 
-
+manoCompleta(Mano):- length(Mano, 3).
 
 
 borrarElementosLista([], _, []).
@@ -38,6 +38,14 @@ borrarElementosLista([X|Resto1], ListaAEliminar, [X|Resultado]) :-
 
 
 
+posibleSecuencia(_, SecuenciaParcial, SecuenciaPosible) :-
+    manoCompleta(SecuenciaParcial), 
+    SecuenciaPosible = SecuenciaParcial.
+posibleSecuencia(CartasPosibles, SecuenciaParcial, SecuenciaPosible) :-
+    not(manoCompleta(SecuenciaParcial)),
+    posibleCartaDeLista(CartasPosibles, NuevaCarta),
+    posibleSecuencia([NuevaCarta | CartasPosibles], [NuevaCarta | SecuenciaParcial], SecuenciaPosible).
+    
 
 /*
 posibleManoAdversario(ManoPropia, CartasEnMesa, PosibleManoAdversario) :-

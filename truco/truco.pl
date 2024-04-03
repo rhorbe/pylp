@@ -250,9 +250,17 @@ obtenerCartasSinJugarAdversario(ManoPropia, CartasDelOponenteJugadas, ListaPosib
 listaCompletaCartas(ListaCompletaCartas):-
     findall(carta(Numero, Palo), carta(Numero, Palo), ListaCompletaCartas).
 
-obtenerListaPosiblesSecuenciasJuegoPropias(CartasPropiasJugadas,CartasSinJugarPropias, ListaPosiblesSecuenciasJuegoPropias):-
-    
+obtenerListaPosiblesSecuenciasJuegoPropias(CartasPropiasJugadas, CartasSinJugarPropias, ListaPosiblesSecuenciasJuegoPropias):-
+    posibleSecuencia(CartasSinJugarPropias, CartasPropiasJugadas, ListaPosiblesSecuenciasJuegoPropias).
 
+
+posibleSecuencia(_, SecuenciaParcial, SecuenciaPosible) :-
+    manoCompleta(SecuenciaParcial), 
+    SecuenciaPosible = SecuenciaParcial.
+posibleSecuencia(CartasPosibles, SecuenciaParcial, SecuenciaPosible) :-
+    not(manoCompleta(SecuenciaParcial)),
+    posibleCartaDeLista(CartasPosibles, NuevaCarta),
+    posibleSecuencia([NuevaCarta | CartasPosibles], [NuevaCarta | SecuenciaParcial], SecuenciaPosible).
     
 
 
