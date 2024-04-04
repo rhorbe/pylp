@@ -206,84 +206,87 @@ listaCartasConocidas(ManoPropia, CartasEnMesa, ListaCartasConocidas):-
 % oponente, se calcula que las posibilidades de ganas son mayores a las de  
 % perder.
 
+% Obtener cartas sin jugar propias 
+% Obtener posibles cartas sin jugar adversario
+% Armar lista con posibles secuencias de juego propias (Tener en cuenta las ya jugadas)
+% Armar lista con posibles secuencias de juego adversario (Tener en cuenta las ya jugadas)
+% Realizar posibles combinaciones de juegos y contar triunfos y derrotas.
 aceptarTruco(ManoPropia, [CartasPropiasJugadas, CartasDelOponenteJugadas]) :-
-% Armar todas las posibles combinaciones de manos propias, teniendo en cuenta
-% las cartas ya jugadas.
-% Armar todas las posibles 
 
-%Obtener cartas sin jugar propias 
-%Obtener posibles cartas sin jugar adversario
-%Armar lista con posibles secuencias de juego propias (Tener en cuenta las ya jugadas)
-%Armar lista con posibles secuencias de juego adversario (Tener en cuenta las ya jugadas)
-%Realizar posibles combinaciones de juegos y contar triunfos y derrotas.
+    obtenerPosiblesCartasSinJugarAdversario(
+        ManoPropia, 
+        CartasDelOponenteJugadas, 
+        ListaPosiblesCartasSinJugarAdversario),
+    obtenerListaPosiblesSecuencias(
+        ManoPropia, 
+        CartasPropiasJugadas,
+        ListaPosiblesSecuenciasPropias),
+    obtenerListaPosiblesSecuencias(
+        ListaPosiblesCartasSinJugarAdversario,
+        CartasDelOponenteJugadas,
+        ListaPosiblesSecuenciasAdversario),
+    obtenerResultados(
+        ListaPosiblesSecuenciasPropias,
+        ListaPosiblesSecuenciasAdversario,
+        Triunfos,
+        Derrotas),
+    Triunfos > Derrotas.
 
-obtenerCartasSinJugarPropias(
-    ManoPropia, 
-    CartasPropiasJugadas, 
-    CartasSinJugarPropias),
-obtenerCartasSinJugarAdversario(
-    ManoPropia, 
-    CartasDelOponenteJugadas, 
-    ListaPosiblesCartasSinJugarAdversario),
-obtenerListaPosiblesSecuenciasJuegoPropias(
-    CartasPropiasJugadas,
-    CartasSinJugarPropias, 
-    ListaPosiblesSecuenciasJuegoPropias),
-obtenerListaPosiblesSecuenciasJuegoAdversario(
-    ListaPosiblesCartasSinJugarAdversario, 
-    ListaPosiblesSecuenciasJuegoAdversario),
-obtenerEstadisticasResultados(
-    ListaPosiblesSecuenciasJuegoPropias,
-    ListaPosiblesSecuenciasJuegoAdversario,
-    Triunfos,
-    Derrotas),
-Triunfos > Derrotas.
-
-obtenerCartasSinJugarPropias(ManoPropia, CartasPropiasJugadas, CartasSinJugarPropias):-
-    restaListas(ManoPropia, CartasPropiasJugadas, CartasSinJugarPropias).
-
-obtenerCartasSinJugarAdversario(ManoPropia, CartasDelOponenteJugadas, ListaPosiblesCartasSinJugarAdversario):-
+obtenerPosiblesCartasSinJugarAdversario(ManoPropia, CartasDelOponenteJugadas, ListaPosiblesCartasSinJugarAdversario):-
     listaCartasConocidas(ManoPropia, CartasDelOponenteJugadas, ListaCartasConocidas),
     listaCompletaCartas(ListaCompletaCartas),
-    restaListas(ListaCompletaCartas, ListaCartasConocidas, ListaPosiblesCartasSinJugarAdversario).
+    restarListas(ListaCompletaCartas, ListaCartasConocidas, ListaPosiblesCartasSinJugarAdversario).
+
+obtenerListaPosiblesSecuencias(CartasPosibles, CartasJugadas, ListaPosiblesSecuenciasJuego):-
+    findall(Secuencia, posibleSecuencia(CartasPosibles, CartasJugadas, Secuencia), ListaPosiblesSecuenciasJuego).
+
 
 listaCompletaCartas(ListaCompletaCartas):-
     findall(carta(Numero, Palo), carta(Numero, Palo), ListaCompletaCartas).
 
-obtenerListaPosiblesSecuenciasJuegoPropias(CartasPropiasJugadas, CartasSinJugarPropias, ListaPosiblesSecuenciasJuegoPropias):-
-    posibleSecuencia(CartasSinJugarPropias, CartasPropiasJugadas, ListaPosiblesSecuenciasJuegoPropias).
+posibleSecuencia(_, CartasJugadas, Secuencia):-
+    manoCompleta(CartasJugadas),
+    Secuencia = CartasJugadas.
 
+posibleSecuencia(CartasPosibles, CartasJugadas, Secuencia):-
+    \+(manoCompleta(CartasJugadas)),
+    member(NuevaCarta, CartasPosibles),
+    \+(member(NuevaCarta, CartasJugadas)),
+    append(CartasJugadas, [NuevaCarta], CartasJugadasConNuevaCarta),
+    delete(CartasPosibles, NuevaCarta, CartasPosiblesSinNuevaCarta),
+    posibleSecuencia(CartasPosiblesSinNuevaCarta, CartasJugadasConNuevaCarta, Secuencia).
 
-posibleSecuencia(_, SecuenciaParcial, SecuenciaPosible) :-
-    manoCompleta(SecuenciaParcial), 
-    SecuenciaPosible = SecuenciaParcial.
-posibleSecuencia(CartasPosibles, SecuenciaParcial, SecuenciaPosible) :-
-    not(manoCompleta(SecuenciaParcial)),
-    posibleCartaDeLista(CartasPosibles, NuevaCarta),
-    posibleSecuencia([NuevaCarta | CartasPosibles], [NuevaCarta | SecuenciaParcial], SecuenciaPosible).
-    
-
-
-
-%completarManoPropiaJugada(ManoPropia, CartasPropiasJugadas, PosibleSecuenciaJuego).
-
-
-
-
-completarManoPropiaJugada(ManoPropia, CartasPropiasJugadas, PosibleSecuenciaJuego):-
-    ManoPropia = [Carta1, Carta2, Carta3],
-    posibleJugada(ManoPropia, [CartaJugada1, CartaJugada2, CartaJugada3]),
-
-
-
-restaListas([], _, []).
+restarListas([], _, []).
 
 % Restar elementos de la lista Sustraendo de la lista Original, resultando en Diferencia
-restaListas([X|ColaOriginal], Sustraendo, Diferencia ) :-
+restarListas([X|ColaOriginal], Sustraendo, Diferencia ) :-
     member(X, Sustraendo),
-    restaListas(ColaOriginal, Sustraendo, Diferencia).
+    restarListas(ColaOriginal, Sustraendo, Diferencia).
 
 % Si el elemento X no está en Sustraendo, lo incluimos en Diferencia
-restaListas([X|ColaOriginal], Sustraendo, [X|Diferencia]) :-
+restarListas([X|ColaOriginal], Sustraendo, [X|Diferencia]) :-
     not(member(X, Sustraendo)),
-    restaListas(ColaOriginal, Sustraendo, Diferencia).
+    restarListas(ColaOriginal, Sustraendo, Diferencia).
+
+
+% Predicado para comparar todos los elementos de la lista 1 contra todos los elementos de la lista 2
+comparar_elementos(_, [], Triunfos, Derrotas, Triunfos, Derrotas).
+comparar_elementos(X, [Y|Ys], TriunfosParciales, DerrotasParciales, Triunfos, Derrotas) :-
+    gana(X,Y),
+    TriunfosTemp is TriunfosParciales + 1,
+    comparar_elementos(X, Ys, TriunfosTemp, DerrotasParciales, Triunfos, Derrotas).
+
+comparar_elementos(X, [Y|Ys], TriunfosParciales, DerrotasParciales, Triunfos, Derrotas) :-
+    \+ gana(X,Y),
+    DerrotasTemp is DerrotasParciales + 1,
+    comparar_elementos(X, Ys, TriunfosParciales, DerrotasTemp, Triunfos, Derrotas).
+
+% Predicado para comparar todos los elementos de la lista 1 contra todos los elementos de la lista 2
+comparar_listas([], _, Triunfos, Derrotas, Triunfos, Derrotas).
+comparar_listas([X|Xs], Lista2, TriunfosParciales, DerrotasParciales, Triunfos, Derrotas) :-
+    comparar_elementos(X, Lista2, 0, 0, TriunfosTemp, DerrotasTemp),
+    comparar_listas(Xs, Lista2, TriunfosTemp, DerrotasTemp, Triunfos, Derrotas).
+
+% Predicado para inicializar la comparación de las listas
+obtenerResultados(Lista1, Lista2, Triunfos, Derrotas) :-
+    comparar_listas(Lista1, Lista2, 0, 0, Triunfos, Derrotas).

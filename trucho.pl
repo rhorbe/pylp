@@ -24,7 +24,7 @@ sum_list([X|Xs], Sum) :-
 
 manoCompleta(Mano):- length(Mano, 3).
 
-
+/* 
 borrarElementosLista([], _, []).
 
 borrarElementosLista([X|Resto1], ListaAEliminar, Resultado) :-
@@ -44,7 +44,7 @@ posibleSecuencia(_, SecuenciaParcial, SecuenciaPosible) :-
 posibleSecuencia(CartasPosibles, SecuenciaParcial, SecuenciaPosible) :-
     not(manoCompleta(SecuenciaParcial)),
     posibleCartaDeLista(CartasPosibles, NuevaCarta),
-    posibleSecuencia([NuevaCarta | CartasPosibles], [NuevaCarta | SecuenciaParcial], SecuenciaPosible).
+    posibleSecuencia([NuevaCarta | CartasPosibles], [NuevaCarta | SecuenciaParcial], SecuenciaPosible). */
     
 
 /*
@@ -108,3 +108,44 @@ restaListas([X|ColaOriginal], Sustraendo, [X|Diferencia]) :-
     not(member(X, Sustraendo)),
     restaListas(ColaOriginal, Sustraendo, Diferencia).
 */
+
+listaPosiblesSecuencias(CartasPosibles, CartasJugadas, ListaPosiblesSecuencias) :-
+    findall(Secuencia, posibleSecuencia(CartasPosibles, CartasJugadas, Secuencia), ListaPosiblesSecuencias).
+
+posibleSecuencia(_, CartasJugadas, Secuencia):-
+    manoCompleta(CartasJugadas),
+    Secuencia = CartasJugadas.
+
+posibleSecuencia(CartasPosibles, CartasJugadas, Secuencia):-
+    \+(manoCompleta(CartasJugadas)),
+    member(NuevaCarta, CartasPosibles),
+    \+(member(NuevaCarta, CartasJugadas)),
+    append(CartasJugadas, [NuevaCarta], CartasJugadasConNuevaCarta),
+    delete(CartasPosibles, NuevaCarta, CartasPosiblesSinNuevaCarta),
+    posibleSecuencia(CartasPosiblesSinNuevaCarta, CartasJugadasConNuevaCarta, Secuencia).
+
+% Predicado para comparar todos los elementos de la lista 1 contra todos los elementos de la lista 2
+comparar_elementos(_, [], Triunfos, Derrotas, Triunfos, Derrotas).
+comparar_elementos(X, [Y|Ys], TriunfosParciales, DerrotasParciales, Triunfos, Derrotas) :-
+    X >= Y,
+    TriunfosTemp is TriunfosParciales + 1,
+    comparar_elementos(X, Ys, TriunfosTemp, DerrotasParciales, Triunfos, Derrotas).
+comparar_elementos(X, [Y|Ys], TriunfosParciales, DerrotasParciales, Triunfos, Derrotas) :-
+    X < Y,
+    DerrotasTemp is DerrotasParciales + 1,
+    comparar_elementos(X, Ys, TriunfosParciales, DerrotasTemp, Triunfos, Derrotas).
+
+% Predicado para comparar todos los elementos de la lista 1 contra todos los elementos de la lista 2
+comparar_listas([], _, Triunfos, Derrotas, Triunfos, Derrotas).
+comparar_listas([X|Xs], Lista2, TriunfosParciales, DerrotasParciales, Triunfos, Derrotas) :-
+    comparar_elementos(X, Lista2, 0, 0, TriunfosTemp, DerrotasTemp),
+    comparar_listas(Xs, Lista2, TriunfosTemp, DerrotasTemp, Triunfos, Derrotas).
+
+% Predicado para inicializar la comparación de las listas
+iniciar_comparacion(Lista1, Lista2, Triunfos, Derrotas) :-
+    comparar_listas(Lista1, Lista2, 0, 0, Triunfos, Derrotas).
+
+% Ejemplo de uso:
+% ?- iniciar_comparacion([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [10, 9, 8, 7, 6, 5, 4, 3, 2, 1], Triunfos, Derrotas).
+% Triunfos = 5,
+% Derrotas = 95.

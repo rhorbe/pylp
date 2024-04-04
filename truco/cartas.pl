@@ -18,8 +18,8 @@ carta(5, basto).
 carta(6, basto).
 carta(7, basto).
 carta(10,basto).
-carta(11,basto).*/
-carta(12,basto). 
+carta(11,basto).
+carta(12,basto).*/ 
 
 carta(1, oro).
 carta(2, oro).
@@ -28,11 +28,11 @@ carta(4, oro).
 carta(5, oro).
 carta(6, oro).
 carta(7, oro).
-carta(10,oro).
+carta(10,oro). /* 
 carta(11,oro).
 carta(12,oro).
 
-/* carta(1, copa).
+carta(1, copa).
 carta(2, copa).
 carta(3, copa).
 carta(4, copa).
