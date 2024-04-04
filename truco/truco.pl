@@ -270,23 +270,23 @@ restarListas([X|ColaOriginal], Sustraendo, [X|Diferencia]) :-
 
 
 % Predicado para comparar todos los elementos de la lista 1 contra todos los elementos de la lista 2
-comparar_elementos(_, [], Triunfos, Derrotas, Triunfos, Derrotas).
-comparar_elementos(X, [Y|Ys], TriunfosParciales, DerrotasParciales, Triunfos, Derrotas) :-
+compararElementos(_, [], Triunfos, Derrotas, Triunfos, Derrotas).
+compararElementos(X, [Y|Ys], TriunfosParciales, DerrotasParciales, Triunfos, Derrotas) :-
     gana(X,Y),
     TriunfosTemp is TriunfosParciales + 1,
-    comparar_elementos(X, Ys, TriunfosTemp, DerrotasParciales, Triunfos, Derrotas).
+    compararElementos(X, Ys, TriunfosTemp, DerrotasParciales, Triunfos, Derrotas).
 
-comparar_elementos(X, [Y|Ys], TriunfosParciales, DerrotasParciales, Triunfos, Derrotas) :-
+compararElementos(X, [Y|Ys], TriunfosParciales, DerrotasParciales, Triunfos, Derrotas) :-
     \+ gana(X,Y),
     DerrotasTemp is DerrotasParciales + 1,
-    comparar_elementos(X, Ys, TriunfosParciales, DerrotasTemp, Triunfos, Derrotas).
+    compararElementos(X, Ys, TriunfosParciales, DerrotasTemp, Triunfos, Derrotas).
 
 % Predicado para comparar todos los elementos de la lista 1 contra todos los elementos de la lista 2
-comparar_listas([], _, Triunfos, Derrotas, Triunfos, Derrotas).
-comparar_listas([X|Xs], Lista2, TriunfosParciales, DerrotasParciales, Triunfos, Derrotas) :-
-    comparar_elementos(X, Lista2, 0, 0, TriunfosTemp, DerrotasTemp),
-    comparar_listas(Xs, Lista2, TriunfosTemp, DerrotasTemp, Triunfos, Derrotas).
+compararListas([], _, Triunfos, Derrotas, Triunfos, Derrotas).
+compararListas([X|Xs], Lista2, _, _, Triunfos, Derrotas) :-
+    compararElementos(X, Lista2, 0, 0, TriunfosTemp, DerrotasTemp),
+    compararListas(Xs, Lista2, TriunfosTemp, DerrotasTemp, Triunfos, Derrotas).
 
 % Predicado para inicializar la comparación de las listas
 obtenerResultados(Lista1, Lista2, Triunfos, Derrotas) :-
-    comparar_listas(Lista1, Lista2, 0, 0, Triunfos, Derrotas).
+    compararListas(Lista1, Lista2, 0, 0, Triunfos, Derrotas).
