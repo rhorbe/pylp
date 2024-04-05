@@ -205,12 +205,6 @@ listaCartasConocidas(ManoPropia, CartasEnMesa, ListaCartasConocidas):-
 % Se acepta truco cuando en base a las cartas propias y las jugadas por el 
 % oponente, se calcula que las posibilidades de ganas son mayores a las de  
 % perder.
-
-% Obtener cartas sin jugar propias 
-% Obtener posibles cartas sin jugar adversario
-% Armar lista con posibles secuencias de juego propias (Tener en cuenta las ya jugadas)
-% Armar lista con posibles secuencias de juego adversario (Tener en cuenta las ya jugadas)
-% Realizar posibles combinaciones de juegos y contar triunfos y derrotas.
 aceptarTruco(ManoPropia, [CartasPropiasJugadas, CartasDelOponenteJugadas]) :-
 
     obtenerPosiblesCartasSinJugarAdversario(
@@ -258,18 +252,14 @@ posibleSecuencia(CartasPosibles, CartasJugadas, Secuencia):-
 
 restarListas([], _, []).
 
-% Restar elementos de la lista Sustraendo de la lista Original, resultando en Diferencia
 restarListas([X|ColaOriginal], Sustraendo, Diferencia ) :-
     member(X, Sustraendo),
     restarListas(ColaOriginal, Sustraendo, Diferencia).
-
-% Si el elemento X no está en Sustraendo, lo incluimos en Diferencia
 restarListas([X|ColaOriginal], Sustraendo, [X|Diferencia]) :-
     not(member(X, Sustraendo)),
     restarListas(ColaOriginal, Sustraendo, Diferencia).
 
 
-% Predicado para comparar todos los elementos de la lista 1 contra todos los elementos de la lista 2
 compararElementos(_, [], Triunfos, Derrotas, Triunfos, Derrotas).
 compararElementos(X, [Y|Ys], TriunfosParciales, DerrotasParciales, Triunfos, Derrotas) :-
     gana(X,Y),
@@ -281,12 +271,10 @@ compararElementos(X, [Y|Ys], TriunfosParciales, DerrotasParciales, Triunfos, Der
     DerrotasTemp is DerrotasParciales + 1,
     compararElementos(X, Ys, TriunfosParciales, DerrotasTemp, Triunfos, Derrotas).
 
-% Predicado para comparar todos los elementos de la lista 1 contra todos los elementos de la lista 2
 compararListas([], _, Triunfos, Derrotas, Triunfos, Derrotas).
 compararListas([X|Xs], Lista2, _, _, Triunfos, Derrotas) :-
     compararElementos(X, Lista2, 0, 0, TriunfosTemp, DerrotasTemp),
     compararListas(Xs, Lista2, TriunfosTemp, DerrotasTemp, Triunfos, Derrotas).
 
-% Predicado para inicializar la comparación de las listas
 obtenerResultados(Lista1, Lista2, Triunfos, Derrotas) :-
     compararListas(Lista1, Lista2, 0, 0, Triunfos, Derrotas).
